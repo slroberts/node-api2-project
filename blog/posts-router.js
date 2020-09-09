@@ -22,11 +22,11 @@ router.post("/", (req, res) => {
 });
 
 router.post("/:id/comments", (req, res) => {
-  Post.insertComment(req.params.id, comment)
+  Post.insertComment({text: req.body.text, post_id: req.params.id})
     .then((comment) => {
-      if (comment) {
-        res.status(201).json(comment);
-      } else if (!req.text) {
+      res.status(201).json(comment);
+
+      if (!comment.text) {
         res
           .status(400)
           .json({errorMessage: "Please provide text for the comment."});
@@ -76,7 +76,7 @@ router.get("/:id", (req, res) => {
     });
 });
 
-router.get("/api/posts/:id/comments", (req, res) => {
+router.get("/:id/comments", (req, res) => {
   Posts.findPostComments(req.params.id)
     .then((post) => {
       if (post) {
@@ -95,7 +95,7 @@ router.get("/api/posts/:id/comments", (req, res) => {
     });
 });
 
-router.delete("/api/posts/:id", (req, res) => {
+router.delete("/:id", (req, res) => {
   Posts.remove(req.params.id)
     .then((count) => {
       if (count > 0) {
@@ -114,7 +114,7 @@ router.delete("/api/posts/:id", (req, res) => {
     });
 });
 
-router.put("/api/posts/:id", (req, res) => {
+router.put("/:id", (req, res) => {
   const changes = req.body;
 
   Posts.update(req.params.id, changes)
