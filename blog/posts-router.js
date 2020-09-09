@@ -3,45 +3,45 @@ const router = express.Router();
 const Posts = require("../data/db.js");
 
 router.post("/", (req, res) => {
-  Posts.insert(req.body)
-    .then((post) => {
-      if (!req.body.title || !req.body.contents) {
-        res.status(400).json({
-          errorMessage: "Please provide title and contents for the post.",
+  if (req.body.title || req.body.contents) {
+    Posts.insert(req.body)
+      .then((id) => {
+        console.log(id);
+        Posts.findById(id).then((post) => {
+          console.log(post);
+          res.status(200).json(post);
         });
-      } else {
-        res.status(201).json(post);
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).json({
-        error: "There was an error while saving the post to the database.",
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).json({
+          error: "There was an error while saving the post to the database.",
+        });
       });
-    });
+  }
 });
 
 router.post("/:id/comments", (req, res) => {
-  Post.insertComment({text: req.body.text, post_id: req.params.id})
-    .then((comment) => {
-      res.status(201).json(comment);
-
-      if (!comment.text) {
-        res
-          .status(400)
-          .json({errorMessage: "Please provide text for the comment."});
-      } else if (!req.params.id) {
-        res
-          .status(404)
-          .json({message: "The post with the specified ID does not exist."});
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).json({
-        error: "There was an error while saving the comment to the database.",
+  if (comment.text) {
+    Post.insertComment({text: req.body.text, post_id: req.params.id})
+      .then((comment) => {
+        res.status(201).json(comment);
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).json({
+          error: "There was an error while saving the comment to the database.",
+        });
       });
-    });
+  } else if (!comment.text) {
+    res
+      .status(400)
+      .json({errorMessage: "Please provide text for the comment."});
+  } else if (!req.params.id) {
+    res
+      .status(404)
+      .json({message: "The post with the specified ID does not exist."});
+  }
 });
 
 router.get("/", (req, res) => {
@@ -121,7 +121,7 @@ router.put("/:id", (req, res) => {
     .then((post) => {
       if (post) {
         res.status(200).json(post);
-      } else if (!req.title || !req.contents) {
+      } else if (!req.body.title || !req.body.contents) {
         res.status(400).json({
           errorMessage: "Please provide title and contents for the post.",
         });
