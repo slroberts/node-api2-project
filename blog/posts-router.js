@@ -3,6 +3,7 @@ const router = express.Router();
 const Posts = require("../data/db.js");
 
 router.post("/", (req, res) => {
+  //check condition first before posting.
   if (req.body.title || req.body.contents) {
     Posts.insert(req.body)
       .then((id) => {
